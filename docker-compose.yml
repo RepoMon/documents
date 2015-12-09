@@ -1,42 +1,42 @@
 rabbitmq:
-      image: rabbitmq 
+  image: rabbitmq 
    
-   redis:
-     image: redis
+redis:
+  image: redis
    
-   repoman:
-     build: repo-man/
-     ports:
-       - "49400:80"
-     links:
-       - redis
-       - rabbitmq
-       - token
+repoman:
+  build: repo-man/
+  ports:
+    - "49400:80"
+  links:
+    - redis
+    - rabbitmq
+    - token
    
-   ui:
-     build: ui/ 
-     ports:
-       - "49401:80"
-     links:
-       - repoman
-       - token
-       - rabbitmq
-     environment:
-       - GH_BASIC_CLIENT_ID
-       - GH_BASIC_CLIENT_SECRET
+ui:
+  build: ui/ 
+  ports:
+    - "49401:80"
+  links:
+    - repoman
+    - token
+    - rabbitmq
+  environment:
+    - GH_BASIC_CLIENT_ID
+    - GH_BASIC_CLIENT_SECRET
    
-   scheduler:
-     build: scheduler/
-     links:
-       - redis
-       - rabbitmq
+scheduler:
+  build: scheduler/
+  links:
+    - redis
+    - rabbitmq
    
-   token:
-     build: tokens/
-     ports:
-       - "49402:80"
-     links:
-       - redis
-       - rabbitmq
-     environment:
-       - TOKEN_ENCRYPTION_KEY
+token:
+  build: tokens/
+  ports:
+    - "49402:80"
+  links:
+    - redis
+    - rabbitmq
+  environment:
+    - TOKEN_ENCRYPTION_KEY
