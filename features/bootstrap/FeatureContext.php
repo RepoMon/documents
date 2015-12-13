@@ -4,12 +4,34 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Channel\AMQPChannel;
+use GuzzleHttp\Client;
 
 /**
  * Defines application features from the specific context.
  */
 class FeatureContext implements Context, SnippetAcceptingContext
 {
+    private $token_host = 'token';
+
+    private $rabbit_host = 'rabbitmq';
+
+    private $rabbit_port = '5672';
+
+    private $rabbit_channel = 'repo-mon.main';
+
+    /**
+     * @var AMQPStreamConnection
+     */
+    private $connection;
+
+    /**
+     * @var AMQPChannel
+     */
+    private $channel;
+
     /**
      * Initializes context.
      *
@@ -21,28 +43,91 @@ class FeatureContext implements Context, SnippetAcceptingContext
     {
     }
 
-    /**
-     * @Given event named :arg1 for user :arg2 with token :arg3 is published
-     */
-    public function eventNamedForUserWithTokenIsPublished($event, $user, $token)
-    {
 
-        throw new PendingException();
+    /**
+     * @Given a token added event for user :arg1 with token :arg2 is published
+     */
+    public function aTokenAddedEventForUserWithTokenIsPublished($user, $token)
+    {
+        $this->publishEvent(
+            [
+                'name' => 'repo-mon.token.added',
+                'data' => [
+                    'user' => $user,
+                    'token' => $token
+                ]
+            ]
+        );
     }
 
     /**
-     * @When I make a request for the token of user :arg1
+     * @Given no token exists for user :arg1
      */
-    public function iMakeARequestForTheTokenOfUser($user)
+    public function noTokenExistsForUser($user)
     {
-        throw new PendingException();
+        $client = new Client();
+
+        // trim any white space from the response body
+        $endpoint = sprintf('http://%s/tokens/%s', $this->token_host, $user);
+
+        $client->request('DELETE', $endpoint);
     }
 
     /**
-     * @Then I receive token :arg1
+     * @Then user :arg1 has token :arg2
      */
-    public function iReceiveToken($token)
+    public function userHasToken($user, $token)
     {
-        throw new PendingException();
+        $client = new Client();
+
+        // trim any white space from the response body
+        $endpoint = sprintf('http://%s/tokens/%s', $this->token_host, $user);
+
+        $actual = trim($client->request('GET', $endpoint)->getBody());
+
+        if ($token !== $actual) {
+            throw new Exception(
+                "Expected token to be '$token' but it is '$actual'"
+            );
+        }
+    }
+
+    /**
+     *
+     */
+    private function connect()
+    {
+        if (!$this->connection) {
+            $this->connection = new AMQPStreamConnection($this->rabbit_host, $this->rabbit_port, 'guest', 'guest');
+            $this->channel = $this->connection->channel();
+            $this->channel->exchange_declare($this->rabbit_channel, 'fanout', false, false, false);
+        }
+    }
+
+    /**
+     *
+     */
+    public function __destruct()
+    {
+        if ($this->connection) {
+            $this->channel->close();
+            $this->connection->close();
+        }
+    }
+
+    /**
+     * @param array $event
+     */
+    public function publishEvent(array $event)
+    {
+        $this->connect();
+
+        $msg = new AMQPMessage(json_encode($event, JSON_UNESCAPED_SLASHES), [
+            'content_type' => 'application/json',
+            'timestamp' => time()
+        ]);
+
+        $this->channel->basic_publish($msg, $this->rabbit_channel);
+
     }
 }

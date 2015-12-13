@@ -47,3 +47,11 @@ token:
     - rabbitmq
   environment:
     - TOKEN_ENCRYPTION_KEY
+
+documents:
+  build: documents/
+  links:
+    - rabbitmq
+    - token
+    - repoman
+    - mysql
