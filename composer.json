@@ -1,0 +1,23 @@
+{
+  "name": "RepoMon/documents",
+  "description": "Documents and integration tests for repo-mon",
+  "authors": [
+    {
+      "name": "Tim Rodger",
+      "email": "tim.rodger@gmail.com"
+    }
+  ],
+
+  "require" : {
+    "behat/behat" : "3.0.*",
+    "guzzlehttp/guzzle": "^6.1",
+    "videlalvaro/php-amqplib": "2.5.*"
+  },
+
+  "config": {
+    "bin-dir": "bin"
+  },
+
+  "minimum-stability": "dev"
+
+}
