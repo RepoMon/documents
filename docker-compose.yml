@@ -1,9 +1,14 @@
 rabbitmq:
-  image: rabbitmq 
-   
+   image: rabbitmq 
+
 redis:
   image: redis
-   
+
+mysql:
+  image: mysql
+  environment:
+    - MYSQL_ROOT_PASSWORD=1234
+
 repoman:
   build: repo-man/
   ports:
@@ -12,9 +17,9 @@ repoman:
     - redis
     - rabbitmq
     - token
-   
+
 ui:
-  build: ui/ 
+  build: ui/
   ports:
     - "49401:80"
   links:
@@ -24,13 +29,15 @@ ui:
   environment:
     - GH_BASIC_CLIENT_ID
     - GH_BASIC_CLIENT_SECRET
-   
+
 scheduler:
   build: scheduler/
   links:
-    - redis
     - rabbitmq
-   
+    - mysql
+  environment:
+    - MYSQL_ROOT_PASSWORD=1234
+
 token:
   build: tokens/
   ports:
