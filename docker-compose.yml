@@ -7,7 +7,7 @@ redis:
 mysql:
   image: mysql
   environment:
-    - MYSQL_ROOT_PASSWORD=1234
+    - MYSQL_ROOT_PASSWORD
 
 repoman:
   build: repo-man/
@@ -36,7 +36,7 @@ scheduler:
     - rabbitmq
     - mysql
   environment:
-    - MYSQL_ROOT_PASSWORD=1234
+    - MYSQL_ROOT_PASSWORD
 
 token:
   build: tokens/
