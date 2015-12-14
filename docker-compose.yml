@@ -32,6 +32,8 @@ ui:
 
 scheduler:
   build: scheduler/
+    ports:
+      - "49402:80"
   links:
     - rabbitmq
     - mysql
@@ -41,7 +43,7 @@ scheduler:
 token:
   build: tokens/
   ports:
-    - "49402:80"
+    - "49403:80"
   links:
     - redis
     - rabbitmq
