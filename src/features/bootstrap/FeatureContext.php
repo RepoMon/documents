@@ -161,6 +161,69 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given a schedule exists for repository :arg1 with owner :arg2
+     */
+    public function aScheduleExistsForRepository($repository, $owner)
+    {
+        $this->publishEvent(
+            [
+                'name' => 'repo-mon.repo.configured',
+                'data' => [
+                    'owner' => $owner,
+                    'url' => $repository,
+                    'language' => 'PHP7',
+                    'dependency_manager' => 'composer',
+                    'frequency' => '1',
+                    'hour' => '1',
+                    'timezone' => 'UTC',
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @When a repository un-configured event for repository :arg1 with owner :arg2 is published
+     */
+    public function aRepositoryUnConfiguredEventForRepositoryWithOwnerIsPublished($repository, $owner)
+    {
+        $this->publishEvent(
+            [
+                'name' => 'repo-mon.repo.configured',
+                'data' => [
+                    'owner' => $owner,
+                    'url' => $repository,
+                    'language' => 'PHP7',
+                    'dependency_manager' => 'composer',
+                    'frequency' => '1',
+                    'hour' => '1',
+                    'timezone' => 'UTC',
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @Then repository :arg1 does not have a schedule
+     */
+    public function repositoryDoesNotHaveASchedule($repository)
+    {
+        $client = new Client();
+
+        $endpoint = sprintf('http://%s/schedules/%s', $this->scheduler_host, $repository);
+
+        $schedules = json_decode($client->request('GET', $endpoint)->getBody(), true);
+
+        foreach ($schedules as $scheduled_repository){
+            if ($repository === $scheduled_repository['name']){
+                throw new Exception(
+                    "Did not expect repository '$repository' to be scheduled. " . print_r($schedules)
+                );
+            }
+        }
+
+    }
+
+    /**
      *
      */
     private function connect()
