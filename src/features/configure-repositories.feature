@@ -11,6 +11,6 @@ Scenario: Repository updates can be scheduled
   Then repository 'trial/and-error' has a schedule
 
 Scenario: Repository updates can be unscheduled
-  Given a schedule exists for repository 'trial/and-error' with owner 'user-z'
-  When a repository un-configured event for repository 'trial/and-error' with owner 'user-z' is published
-  Then repository 'trial/and-error' does not have a schedule
+  Given a schedule exists for repository 'trial/and-no-error' with owner 'user-z'
+  When a repository un-configured event for repository 'trial/and-no-error' with owner 'user-z' is published
+  Then repository 'trial/and-no-error' does not have a schedule

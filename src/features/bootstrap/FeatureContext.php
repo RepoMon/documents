@@ -192,14 +192,13 @@ class FeatureContext implements Context, SnippetAcceptingContext
 
         $endpoint = sprintf('http://%s/schedules/%s', $this->scheduler_host, $repository);
 
-        $schedules = json_decode($client->request('GET', $endpoint)->getBody(), true);
+        try {
+            $schedules = json_decode($client->request('GET', $endpoint)->getBody(), true);
+            throw new Exception(
+                "Did not expect repository '$repository' to be scheduled. " . print_r($schedules)
+            );
+        } catch (Exception $ex) {
 
-        foreach ($schedules as $scheduled_repository){
-            if ($repository === $scheduled_repository['name']){
-                throw new Exception(
-                    "Did not expect repository '$repository' to be scheduled. " . print_r($schedules)
-                );
-            }
         }
 
     }
