@@ -149,7 +149,8 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $schedules = json_decode($client->request('GET', $endpoint)->getBody(), true);
 
         foreach ($schedules as $scheduled_repository){
-            if ($repository === $scheduled_repository){
+            if ($repository === $scheduled_repository['name']){
+                // found it
                 return;
             }
         }
