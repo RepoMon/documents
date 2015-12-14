@@ -156,7 +156,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
         }
 
         throw new Exception(
-            "Expected repository '$repository' to be scheduled. " . print_r($schedules)
+            "Expected repository '$repository' to be scheduled. " . print_r($schedules, 1)
         );
     }
 
