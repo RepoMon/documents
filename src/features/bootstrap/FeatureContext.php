@@ -22,6 +22,8 @@ class FeatureContext implements Context, SnippetAcceptingContext
 
     private $rabbit_channel = 'repo-mon.main';
 
+    private $scheduler_host = 'scheduler';
+
     /**
      * @var AMQPStreamConnection
      */
@@ -43,6 +45,16 @@ class FeatureContext implements Context, SnippetAcceptingContext
     {
     }
 
+    /**
+     *
+     */
+    public function __destruct()
+    {
+        if ($this->connection) {
+            $this->channel->close();
+            $this->connection->close();
+        }
+    }
 
     /**
      * @Given a token added event for user :arg1 with token :arg2 is published
@@ -93,6 +105,57 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given no schedules exist for repository :arg1
+     */
+    public function noSchedulesExistForRepository($repository)
+    {
+        //throw new PendingException();
+    }
+
+    /**
+     * @When a repository configured event for repository :arg1 with owner :arg2 is published
+     */
+    public function aRepositoryConfiguredEventForRepositoryWithOwnerIsPublished($repository, $owner)
+    {
+        $this->publishEvent(
+            [
+                'name' => 'repo-mon.repo.configured',
+                'data' => [
+                    'owner' => $owner,
+                    'url' => $repository,
+                    'language' => 'PHP7',
+                    'dependency_manager' => 'composer',
+                    'frequency' => '1',
+                    'hour' => '1',
+                    'timezone' => 'UTC',
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @Then repository :arg1 has a schedule
+     */
+    public function repositoryHasASchedule($repository)
+    {
+        $client = new Client();
+
+        $endpoint = sprintf('http://%s/', $this->scheduler_host);
+
+        $schedules = json_decode($client->request('GET', $endpoint)->getBody(), true);
+
+        foreach ($schedules as $scheduled_repository){
+            if ($repository === $scheduled_repository){
+                return;
+            }
+        }
+
+        throw new Exception(
+            "Expected repository '$repository' to be scheduled"
+        );
+    }
+
+    /**
      *
      */
     private function connect()
@@ -105,20 +168,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     *
-     */
-    public function __destruct()
-    {
-        if ($this->connection) {
-            $this->channel->close();
-            $this->connection->close();
-        }
-    }
-
-    /**
      * @param array $event
      */
-    public function publishEvent(array $event)
+    private function publishEvent(array $event)
     {
         $this->connect();
 

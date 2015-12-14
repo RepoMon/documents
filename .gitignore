@@ -2,3 +2,5 @@
 src/vendor
 bin
 .idea
+
+src/features/bootstrap/FeatureContext.php
