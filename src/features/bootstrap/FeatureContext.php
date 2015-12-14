@@ -109,7 +109,11 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function noSchedulesExistForRepository($repository)
     {
-        //throw new PendingException();
+        $client = new Client();
+
+        $endpoint = sprintf('http://%s/schedules/%s', $this->scheduler_host, $repository);
+
+        $client->request('DELETE', $endpoint);
     }
 
     /**
@@ -140,7 +144,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     {
         $client = new Client();
 
-        $endpoint = sprintf('http://%s/', $this->scheduler_host);
+        $endpoint = sprintf('http://%s/schedules/%s', $this->scheduler_host, $repository);
 
         $schedules = json_decode($client->request('GET', $endpoint)->getBody(), true);
 
@@ -151,7 +155,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
         }
 
         throw new Exception(
-            "Expected repository '$repository' to be scheduled"
+            "Expected repository '$repository' to be scheduled. " . print_r($schedules)
         );
     }
 
