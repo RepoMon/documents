@@ -165,20 +165,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function aScheduleExistsForRepository($repository, $owner)
     {
-        $this->publishEvent(
-            [
-                'name' => 'repo-mon.repo.configured',
-                'data' => [
-                    'owner' => $owner,
-                    'url' => $repository,
-                    'language' => 'PHP7',
-                    'dependency_manager' => 'composer',
-                    'frequency' => '1',
-                    'hour' => '1',
-                    'timezone' => 'UTC',
-                ]
-            ]
-        );
+        $this->aRepositoryConfiguredEventForRepositoryWithOwnerIsPublished($repository, $owner);
     }
 
     /**
@@ -188,15 +175,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
     {
         $this->publishEvent(
             [
-                'name' => 'repo-mon.repo.configured',
+                'name' => 'repo-mon.repo.unconfigured',
                 'data' => [
-                    'owner' => $owner,
-                    'url' => $repository,
-                    'language' => 'PHP7',
-                    'dependency_manager' => 'composer',
-                    'frequency' => '1',
-                    'hour' => '1',
-                    'timezone' => 'UTC',
+                    'url' => $repository
                 ]
             ]
         );
