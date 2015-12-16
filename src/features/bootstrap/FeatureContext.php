@@ -195,7 +195,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
         try {
             $schedules = json_decode($client->request('GET', $endpoint)->getBody(), true);
             throw new Exception(
-                "Did not expect repository '$repository' to be scheduled. " . print_r($schedules)
+                "Did not expect repository '$repository' to be scheduled. " . print_r($schedules, 1)
             );
         } catch (Exception $ex) {
 
