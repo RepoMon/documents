@@ -61,6 +61,27 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function aTokenAddedEventForUserWithTokenIsPublished($user, $token)
     {
+        $this->addToken($user, $token);
+    }
+
+    /**
+     * @Given no token exists for user :arg1
+     */
+    public function noTokenExistsForUser($user)
+    {
+        $this->removeToken($user);
+    }
+
+    /**
+     * @Given the token for user :arg1 is removed
+     */
+    public function theTokenForUserIsRemoved($user)
+    {
+        $this->removeToken($user);
+    }
+
+    private function addToken($user, $token)
+    {
         $this->publishEvent(
             [
                 'name' => 'repo-mon.token.added',
@@ -72,10 +93,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
         );
     }
 
-    /**
-     * @Given no token exists for user :arg1
-     */
-    public function noTokenExistsForUser($user)
+    private function removeToken($user)
     {
         $client = new Client();
 
@@ -86,21 +104,55 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given a token exists for user :arg1
+     */
+    public function aTokenExistsForUser($user)
+    {
+        $this->addToken($user, 'abcd1234');
+    }
+
+    /**
      * @Then user :arg1 has token :arg2
      */
     public function userHasToken($user, $token)
     {
-        $client = new Client();
-
-        // trim any white space from the response body
-        $endpoint = sprintf('http://%s/tokens/%s', $this->token_host, $user);
-
-        $actual = trim($client->request('GET', $endpoint)->getBody());
+        $actual = $this->getUserToken($user);
 
         if ($token !== $actual) {
             throw new Exception(
                 "Expected token to be '$token' but it is '$actual'"
             );
+        }
+    }
+
+    /**
+     * @Then user :arg1 does not have a token
+     */
+    public function userDoesNotHaveAToken($user)
+    {
+        $actual = $this->getUserToken($user);
+
+        if (!is_null($actual)){
+            throw new Exception(
+                "Did not expect a token to exist of user '$user"
+            );
+        }
+    }
+
+    /**
+     * @param $user
+     * @return null|string
+     */
+    private function getUserToken($user)
+    {
+        $client = new Client();
+
+        $endpoint = sprintf('http://%s/tokens/%s', $this->token_host, $user);
+
+        try {
+            return trim($client->request('GET', $endpoint)->getBody());
+        } catch (Exception $ex) {
+            return null;
         }
     }
 
