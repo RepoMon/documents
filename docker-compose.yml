@@ -17,6 +17,9 @@ repoman:
     - redis
     - rabbitmq
     - token
+    - mysql
+  environment:
+    - MYSQL_ROOT_PASSWORD
 
 ui:
   build: ui/
@@ -58,3 +61,5 @@ documents:
     - repoman
     - mysql
     - scheduler
+  environment:
+    - MYSQL_ROOT_PASSWORD
