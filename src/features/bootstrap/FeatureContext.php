@@ -161,11 +161,8 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function noSchedulesExistForRepository($repository)
     {
-        $client = new Client();
+        $this->aRepositoryUnConfiguredEventForRepositoryWithOwnerIsPublished($repository);
 
-        $endpoint = sprintf('http://%s/schedules/%s', $this->scheduler_host, $repository);
-
-        $client->request('DELETE', $endpoint);
     }
 
     /**
@@ -221,9 +218,17 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given no schedules exist for repository :arg1
+     */
+    public function noSchedulesExistForRepositoryWithOwner($repository)
+    {
+        $this->aRepositoryUnConfiguredEventForRepositoryWithOwnerIsPublished($repository);
+    }
+
+    /**
      * @When a repository un-configured event for repository :arg1 with owner :arg2 is published
      */
-    public function aRepositoryUnConfiguredEventForRepositoryWithOwnerIsPublished($repository, $owner)
+    public function aRepositoryUnConfiguredEventForRepositoryWithOwnerIsPublished($repository)
     {
         $this->publishEvent(
             [
