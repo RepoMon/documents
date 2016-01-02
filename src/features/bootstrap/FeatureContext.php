@@ -162,7 +162,6 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function noSchedulesExistForRepository($repository)
     {
         $this->aRepositoryUnConfiguredEventForRepositoryWithOwnerIsPublished($repository);
-
     }
 
     /**
@@ -215,14 +214,6 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function aScheduleExistsForRepository($repository, $owner)
     {
         $this->aRepositoryConfiguredEventForRepositoryWithOwnerIsPublished($repository, $owner);
-    }
-
-    /**
-     * @Given no schedules exist for repository :arg1
-     */
-    public function noSchedulesExistForRepositoryWithOwner($repository)
-    {
-        $this->aRepositoryUnConfiguredEventForRepositoryWithOwnerIsPublished($repository);
     }
 
     /**
