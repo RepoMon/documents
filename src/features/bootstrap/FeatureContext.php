@@ -141,14 +141,20 @@ class FeatureContext implements Context, SnippetAcceptingContext
         }
     }
 
-
+    /**
+     * @Given a schedule exists for repository :arg1 with owner :arg2
+     */
+    public function aScheduleExistsForRepository($repository, $owner)
+    {
+        $this->anEventForRepositoryWithOwnerIsPublished('repo-mon.repository.activated', $repository, $owner);
+    }
 
     /**
      * @Given no schedules exist for repository :arg1 with owner :arg2
      */
     public function noSchedulesExistForRepository($repository, $owner)
     {
-        $this->aRepositoryDeactivatedEventForRepositoryWithOwnerIsPublished($repository, $owner);
+        $this->anEventForRepositoryWithOwnerIsPublished('repo-mon.repository.deactivated', $repository, $owner);
     }
 
     /**
@@ -176,7 +182,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Then repository :arg1 has a schedule
      */
-    public function repositoryHasASchedule($repository)
+    public function assertRepositoryHasASchedule($repository)
     {
         $client = new Client();
 
@@ -199,7 +205,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Then repository :arg1 with owner :arg2 is available
      */
-    public function repositoryIsAvailable($repository, $owner)
+    public function assertRepositoryIsAvailable($repository, $owner)
     {
         $repositories = $this->getAvailableRepositoriesForOwner($owner);
 
@@ -218,7 +224,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Then repository :arg1 with owner :arg2 is activated
      */
-    public function repositoryIsActivated($repository, $owner)
+    public function assertRepositoryIsActivated($repository, $owner)
     {
         $repositories = $this->getAvailableRepositoriesForOwner($owner);
 
@@ -238,7 +244,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Then repository :arg1 with owner :arg2 is deactivated
      */
-    public function repositoryIsDeactivated($repository, $owner)
+    public function assertRepositoryIsDeactivated($repository, $owner)
     {
         $repositories = $this->getAvailableRepositoriesForOwner($owner);
 
@@ -255,30 +261,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @param string $owner
-     * @return array
-     */
-    private function getAvailableRepositoriesForOwner($owner)
-    {
-        $client = new Client();
-
-        $endpoint = sprintf('http://%s/repositories/%s', $this->repoman_host, $owner);
-
-        return json_decode($client->request('GET', $endpoint)->getBody(), true);
-    }
-
-    /**
-     * @Given a schedule exists for repository :arg1 with owner :arg2
-     */
-    public function aScheduleExistsForRepository($repository, $owner)
-    {
-        $this->aRepositoryActivatedEventForRepositoryWithOwnerIsPublished($repository, $owner);
-    }
-
-    /**
      * @Then repository :arg1 does not have a schedule
      */
-    public function repositoryDoesNotHaveASchedule($repository)
+    public function assertRepositoryDoesNotHaveASchedule($repository)
     {
         $client = new Client();
 
@@ -301,6 +286,19 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function waitForXSeconds($seconds)
     {
         sleep($seconds);
+    }
+
+    /**
+     * @param string $owner
+     * @return array
+     */
+    private function getAvailableRepositoriesForOwner($owner)
+    {
+        $client = new Client();
+
+        $endpoint = sprintf('http://%s/repositories/%s', $this->repoman_host, $owner);
+
+        return json_decode($client->request('GET', $endpoint)->getBody(), true);
     }
 
     /**
