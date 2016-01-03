@@ -171,11 +171,12 @@ class FeatureContext implements Context, SnippetAcceptingContext
     {
         $this->publishEvent(
             [
-                'name' => 'repo-mon.repo.configured',
+                'name' => 'repo-mon.repo.activated',
                 'data' => [
                     'owner' => $owner,
                     'url' => $repository,
-                    'language' => 'PHP7',
+                    'full_name' => $repository,
+                    'language' => 'PHP',
                     'dependency_manager' => 'composer',
                     'frequency' => '1',
                     'hour' => '1',
@@ -223,9 +224,10 @@ class FeatureContext implements Context, SnippetAcceptingContext
     {
         $this->publishEvent(
             [
-                'name' => 'repo-mon.repo.unconfigured',
+                'name' => 'repo-mon.repo.deactivated',
                 'data' => [
-                    'url' => $repository
+                    'url' => $repository,
+                    'full_name' => $repository
                 ]
             ]
         );
@@ -249,6 +251,14 @@ class FeatureContext implements Context, SnippetAcceptingContext
 
         }
 
+    }
+
+    /**
+     * @Then wait :arg1 second
+     */
+    public function waitForXSeconds($seconds)
+    {
+        sleep($seconds);
     }
 
     /**

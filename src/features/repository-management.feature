@@ -11,11 +11,13 @@ Feature: Repository management
     Then user 'user-g' does not have a token
 
   Scenario: Repository updates can be scheduled
-    Given no schedules exist for repository 'https://github.com/trial/and-error'
-    When a repository configured event for repository 'https://github.com/trial/and-error' with owner 'user-y' is published
-    Then repository 'https://github.com/trial/and-error' has a schedule
+    Given no schedules exist for repository 'trial/and-error'
+    When a repository configured event for repository 'trial/and-error' with owner 'user-y' is published
+    And wait '1' second
+    Then repository 'trial/and-error' has a schedule
 
   Scenario: Repository updates can be unscheduled
-    Given a schedule exists for repository 'https://github.com/trial/and-no-error' with owner 'user-z'
-    When a repository un-configured event for repository 'https://github.com/trial/and-no-error' with owner 'user-z' is published
-    Then repository 'https://github.com/trial/and-no-error' does not have a schedule
+    Given a schedule exists for repository 'trial/and-no-error' with owner 'user-z'
+    When a repository un-configured event for repository 'trial/and-no-error' with owner 'user-z' is published
+    And wait '1' second
+    Then repository 'trial/and-no-error' does not have a schedule
