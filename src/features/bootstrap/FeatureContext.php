@@ -222,6 +222,23 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Then repository :arg1 with owner :arg2 is unavailable
+     */
+    public function assertRepositoryIsUnavailable($repository, $owner)
+    {
+        $repositories = $this->getAvailableRepositoriesForOwner($owner);
+
+        foreach ($repositories as $available_repository){
+            if ($repository === $available_repository['full_name']){
+                // found it
+                throw new Exception(
+                    "Did not expected repository '$repository' to be available. " . print_r($repositories, 1)
+                );
+            }
+        }
+    }
+
+    /**
      * @Then repository :arg1 with owner :arg2 is activated
      */
     public function assertRepositoryIsActivated($repository, $owner)
@@ -229,7 +246,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $repositories = $this->getAvailableRepositoriesForOwner($owner);
 
         foreach ($repositories as $available_repository){
-            if (($repository === $available_repository['full_name']) && ($available_repository['active'] === 1)) {
+            if (($repository === $available_repository['full_name']) && ($available_repository['active'] == 1)) {
                 // found it
                 return;
             }
@@ -249,7 +266,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $repositories = $this->getAvailableRepositoriesForOwner($owner);
 
         foreach ($repositories as $available_repository){
-            if (($repository === $available_repository['full_name']) && ($available_repository['active'] === 0)) {
+            if (($repository === $available_repository['full_name']) && ($available_repository['active'] == 0)) {
                 // found it
                 return;
             }

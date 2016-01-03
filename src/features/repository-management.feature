@@ -36,3 +36,9 @@ Feature: Repository management
     Given a 'repo-mon.repository.deactivated' event for repository 'test/abc' with owner 'user-a' is published
     And wait '1' second
     Then repository 'test/abc' with owner 'user-a' is deactivated
+
+  Scenario: Repositories can be removed
+    Given a 'repo-mon.repository.added' event for repository 'test/abc' with owner 'user-a' is published
+    And a 'repo-mon.repository.removed' event for repository 'test/abc' with owner 'user-a' is published
+    And wait '1' second
+    Then repository 'test/abc' with owner 'user-a' is unavailable
