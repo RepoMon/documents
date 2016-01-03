@@ -3,6 +3,7 @@ Feature: Repository management
   Scenario: Tokens can be added for owners
     Given no token exists for user 'user-w'
     When a token added event for user 'user-w' with token 'xxxx' is published
+    And wait '1' second
     Then user 'user-w' has token 'xxxx'
 
   Scenario: Tokens can be removed
