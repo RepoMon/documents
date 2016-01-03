@@ -11,13 +11,28 @@ Feature: Repository management
     Then user 'user-g' does not have a token
 
   Scenario: Repository updates can be scheduled
-    Given no schedules exist for repository 'trial/and-error'
-    When a repository configured event for repository 'trial/and-error' with owner 'user-y' is published
+    Given no schedules exist for repository 'trial/and-error' with owner 'user-y'
+    When a 'repo-mon.repository.activated' event for repository 'trial/and-error' with owner 'user-y' is published
     And wait '1' second
     Then repository 'trial/and-error' has a schedule
 
   Scenario: Repository updates can be unscheduled
     Given a schedule exists for repository 'trial/and-no-error' with owner 'user-z'
-    When a repository un-configured event for repository 'trial/and-no-error' with owner 'user-z' is published
+    When a 'repo-mon.repository.deactivated' event for repository 'trial/and-no-error' with owner 'user-z' is published
     And wait '1' second
     Then repository 'trial/and-no-error' does not have a schedule
+
+  Scenario: Repositories can be added
+    When a 'repo-mon.repository.added' event for repository 'test/abc' with owner 'user-a' is published
+    And wait '1' second
+    Then repository 'test/abc' with owner 'user-a' is available
+
+  Scenario: Repositories can be activated
+    Given a 'repo-mon.repository.activated' event for repository 'test/abc' with owner 'user-a' is published
+    And wait '1' second
+    Then repository 'test/abc' with owner 'user-a' is activated
+
+  Scenario: Repositories can be deactivated
+    Given a 'repo-mon.repository.deactivated' event for repository 'test/abc' with owner 'user-a' is published
+    And wait '1' second
+    Then repository 'test/abc' with owner 'user-a' is deactivated

@@ -24,6 +24,8 @@ class FeatureContext implements Context, SnippetAcceptingContext
 
     private $scheduler_host = 'scheduler';
 
+    private $repoman_host = 'repoman';
+    
     /**
      * @var AMQPStreamConnection
      */
@@ -139,48 +141,33 @@ class FeatureContext implements Context, SnippetAcceptingContext
         }
     }
 
+
+
     /**
-     * @param $user
-     * @return null|string
+     * @Given no schedules exist for repository :arg1 with owner :arg2
      */
-    private function getUserToken($user)
+    public function noSchedulesExistForRepository($repository, $owner)
     {
-        $client = new Client();
-
-        $endpoint = sprintf('http://%s/tokens/%s', $this->token_host, $user);
-
-        try {
-            return trim($client->request('GET', $endpoint)->getBody());
-        } catch (Exception $ex) {
-            return null;
-        }
+        $this->aRepositoryDeactivatedEventForRepositoryWithOwnerIsPublished($repository, $owner);
     }
 
     /**
-     * @Given no schedules exist for repository :arg1
+     * @When a :arg1 event for repository :arg2 with owner :arg3 is published
      */
-    public function noSchedulesExistForRepository($repository)
-    {
-        $this->aRepositoryUnConfiguredEventForRepositoryWithOwnerIsPublished($repository);
-    }
-
-    /**
-     * @When a repository configured event for repository :arg1 with owner :arg2 is published
-     */
-    public function aRepositoryConfiguredEventForRepositoryWithOwnerIsPublished($repository, $owner)
+    public function anEventForRepositoryWithOwnerIsPublished($event, $repository, $owner)
     {
         $this->publishEvent(
             [
-                'name' => 'repo-mon.repo.activated',
+                'name' => $event,
                 'data' => [
                     'owner' => $owner,
-                    'url' => $repository,
+                    'url' => 'https://github.com/'.$repository,
                     'full_name' => $repository,
                     'language' => 'PHP',
                     'dependency_manager' => 'composer',
                     'frequency' => '1',
                     'hour' => '1',
-                    'timezone' => 'UTC',
+                    'timezone' => 'Europe/London',
                 ]
             ]
         );
@@ -198,7 +185,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $schedules = json_decode($client->request('GET', $endpoint)->getBody(), true);
 
         foreach ($schedules as $scheduled_repository){
-            if ($repository === $scheduled_repository['url']){
+            if ($repository === $scheduled_repository['full_name']){
                 // found it
                 return;
             }
@@ -210,27 +197,82 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Then repository :arg1 with owner :arg2 is available
+     */
+    public function repositoryIsAvailable($repository, $owner)
+    {
+        $repositories = $this->getAvailableRepositoriesForOwner($owner);
+
+        foreach ($repositories as $available_repository){
+            if ($repository === $available_repository['full_name']){
+                // found it
+                return;
+            }
+        }
+
+        throw new Exception(
+            "Expected repository '$repository' to be available. " . print_r($repositories, 1)
+        );
+    }
+
+    /**
+     * @Then repository :arg1 with owner :arg2 is activated
+     */
+    public function repositoryIsActivated($repository, $owner)
+    {
+        $repositories = $this->getAvailableRepositoriesForOwner($owner);
+
+        foreach ($repositories as $available_repository){
+            if (($repository === $available_repository['full_name']) && ($available_repository['active'] === 1)) {
+                // found it
+                return;
+            }
+        }
+
+        throw new Exception(
+            "Expected repository '$repository' to be activated. " . print_r($repositories, 1)
+        );
+    }
+
+
+    /**
+     * @Then repository :arg1 with owner :arg2 is deactivated
+     */
+    public function repositoryIsDeactivated($repository, $owner)
+    {
+        $repositories = $this->getAvailableRepositoriesForOwner($owner);
+
+        foreach ($repositories as $available_repository){
+            if (($repository === $available_repository['full_name']) && ($available_repository['active'] === 0)) {
+                // found it
+                return;
+            }
+        }
+
+        throw new Exception(
+            "Expected repository '$repository' to be deactivated. " . print_r($repositories, 1)
+        );
+    }
+
+    /**
+     * @param string $owner
+     * @return array
+     */
+    private function getAvailableRepositoriesForOwner($owner)
+    {
+        $client = new Client();
+
+        $endpoint = sprintf('http://%s/repositories/%s', $this->repoman_host, $owner);
+
+        return json_decode($client->request('GET', $endpoint)->getBody(), true);
+    }
+
+    /**
      * @Given a schedule exists for repository :arg1 with owner :arg2
      */
     public function aScheduleExistsForRepository($repository, $owner)
     {
-        $this->aRepositoryConfiguredEventForRepositoryWithOwnerIsPublished($repository, $owner);
-    }
-
-    /**
-     * @When a repository un-configured event for repository :arg1 with owner :arg2 is published
-     */
-    public function aRepositoryUnConfiguredEventForRepositoryWithOwnerIsPublished($repository)
-    {
-        $this->publishEvent(
-            [
-                'name' => 'repo-mon.repo.deactivated',
-                'data' => [
-                    'url' => $repository,
-                    'full_name' => $repository
-                ]
-            ]
-        );
+        $this->aRepositoryActivatedEventForRepositoryWithOwnerIsPublished($repository, $owner);
     }
 
     /**
@@ -287,5 +329,22 @@ class FeatureContext implements Context, SnippetAcceptingContext
 
         $this->channel->basic_publish($msg, $this->rabbit_channel);
 
+    }
+
+    /**
+     * @param $user
+     * @return null|string
+     */
+    private function getUserToken($user)
+    {
+        $client = new Client();
+
+        $endpoint = sprintf('http://%s/tokens/%s', $this->token_host, $user);
+
+        try {
+            return trim($client->request('GET', $endpoint)->getBody());
+        } catch (Exception $ex) {
+            return null;
+        }
     }
 }
