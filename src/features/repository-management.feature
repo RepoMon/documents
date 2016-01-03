@@ -23,6 +23,12 @@ Feature: Repository management
     And wait '1' second
     Then repository 'trial/and-no-error' does not have a schedule
 
+  Scenario: Repository updates can be removed from the schedule
+    Given a schedule exists for repository 'trial/and-no-error' with owner 'user-z'
+    When a 'repo-mon.repository.removed' event for repository 'trial/and-no-error' with owner 'user-z' is published
+    And wait '1' second
+    Then repository 'trial/and-no-error' does not have a schedule
+
   Scenario: Repositories can be added
     When a 'repo-mon.repository.added' event for repository 'test/abc' with owner 'user-a' is published
     And wait '1' second
