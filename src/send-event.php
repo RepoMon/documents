@@ -19,13 +19,14 @@ $name = $argv[1];
 $url = $argv[2];
 $owner = $argv[3];
 
-$full_name = parse_url($url, PHP_URL_PATH);
+$full_name = trim(parse_url($url, PHP_URL_PATH), '/');
 
 $event = [
     'name' => $name,
     'data' => [
         'owner' => $owner,
         'url' => $url,
+        'description' => 'A repository called ' . $full_name,
         'full_name' => $full_name,
         'language' => 'PHP',
         'dependency_manager' => 'composer',

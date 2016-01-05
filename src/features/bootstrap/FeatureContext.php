@@ -168,6 +168,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
                 'data' => [
                     'owner' => $owner,
                     'url' => 'https://github.com/'.$repository,
+                    'description' => 'A repository called ' . $repository,
                     'full_name' => $repository,
                     'language' => 'PHP',
                     'dependency_manager' => 'composer',
