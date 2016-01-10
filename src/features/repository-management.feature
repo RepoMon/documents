@@ -11,6 +11,10 @@ Feature: Repository management
     When the token for user 'user-g' is removed
     Then user 'user-g' does not have a token
 
+  Scenario: Requesting a missing token fails
+    Given no token exists for user 'user-a'
+    Then a request for the token of user 'user-a' fails
+
   Scenario: Repository updates can be scheduled
     Given no schedules exist for repository 'trial/and-error' with owner 'user-y'
     When a 'repo-mon.repository.activated' event for repository 'trial/and-error' with owner 'user-y' is published

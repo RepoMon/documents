@@ -279,6 +279,20 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Then a request for the token of user :arg1 fails
+     */
+    public function aRequestForTheTokenOfUserFails($user)
+    {
+        $actual = $this->getUserToken($user);
+
+        if (!is_null($actual)){
+            throw new Exception(
+                "Did not expect a token to exist of user '$user"
+            );
+        }
+    }
+
+    /**
      * @Then repository :arg1 does not have a schedule
      */
     public function assertRepositoryDoesNotHaveASchedule($repository)
