@@ -14,12 +14,16 @@ repoman:
   ports:
     - "49400:80"
   links:
-    - redis
     - rabbitmq
     - token
     - mysql
   environment:
     - MYSQL_ROOT_PASSWORD
+
+update:
+  build: update/
+  links:
+    - rabbitmq
 
 ui:
   build: ui/
