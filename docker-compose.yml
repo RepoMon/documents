@@ -9,8 +9,8 @@ mysql:
   environment:
     - MYSQL_ROOT_PASSWORD
 
-repoman:
-  build: repo-man/
+repository:
+  build: repository/
   ports:
     - "49400:80"
   links:
@@ -30,7 +30,7 @@ ui:
   ports:
     - "49401:80"
   links:
-    - repoman
+    - repository
     - token
     - rabbitmq
   environment:
@@ -64,7 +64,7 @@ documents:
   links:
     - rabbitmq
     - token
-    - repoman
+    - repository
     - mysql
     - scheduler
   environment:

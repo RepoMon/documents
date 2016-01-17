@@ -24,7 +24,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
 
     private $scheduler_host = 'scheduler';
 
-    private $repoman_host = 'repoman';
+    private $repository_host = 'repository';
     
     /**
      * @var AMQPStreamConnection
@@ -328,7 +328,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     {
         $client = new Client();
 
-        $endpoint = sprintf('http://%s/repositories/%s', $this->repoman_host, $owner);
+        $endpoint = sprintf('http://%s/repositories/%s', $this->repository_host, $owner);
 
         return json_decode($client->request('GET', $endpoint)->getBody(), true);
     }
