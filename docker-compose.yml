@@ -20,6 +20,13 @@ repository:
   environment:
     - MYSQL_ROOT_PASSWORD
 
+director:
+  build: director/
+  links:
+    - rabbitmq
+    - token
+    - repository
+
 update:
   build: update/
   links:

@@ -26,10 +26,6 @@ CMD ["/home/app/run.sh"]
 # Move application files into place
 COPY src/ /home/app/
 
-# remove any development cruft
-RUN rm -rf /home/app/vendor/*
-RUN rm -rf /home/app/bin/*
-
 WORKDIR /home/app
 
 # Install dependencies

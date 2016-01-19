@@ -328,7 +328,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     {
         $client = new Client();
 
-        $endpoint = sprintf('http://%s/repositories/%s', $this->repository_host, $owner);
+        $endpoint = sprintf('http://%s/repositories?owner=%s', $this->repository_host, $owner);
 
         return json_decode($client->request('GET', $endpoint)->getBody(), true);
     }
