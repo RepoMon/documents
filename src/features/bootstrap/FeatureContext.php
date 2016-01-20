@@ -97,12 +97,14 @@ class FeatureContext implements Context, SnippetAcceptingContext
 
     private function removeToken($user)
     {
-        $client = new Client();
-
-        // trim any white space from the response body
-        $endpoint = sprintf('http://%s/tokens/%s', $this->token_host, $user);
-
-        $client->request('DELETE', $endpoint);
+        $this->publishEvent(
+            [
+                'name' => 'repo-mon.token.removed',
+                'data' => [
+                    'user' => $user
+                ]
+            ]
+        );
     }
 
     /**
@@ -350,6 +352,8 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     private function publishEvent(array $event)
     {
+        $event['version'] = '1.0.0';
+
         $this->connect();
 
         $msg = new AMQPMessage(json_encode($event, JSON_UNESCAPED_SLASHES), [
