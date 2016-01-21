@@ -9,6 +9,7 @@ Feature: Repository management
   Scenario: Tokens can be removed
     Given a token exists for user 'user-g'
     When the token for user 'user-g' is removed
+    And wait '1' second
     Then user 'user-g' does not have a token
 
   Scenario: Requesting a missing token fails
