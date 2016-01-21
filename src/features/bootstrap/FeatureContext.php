@@ -177,6 +177,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
                     'frequency' => '1',
                     'hour' => '1',
                     'timezone' => 'Europe/London',
+                    'private' => false,
                 ]
             ]
         );
