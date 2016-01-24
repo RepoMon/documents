@@ -18,6 +18,9 @@ $channel->exchange_declare($channel_name, 'fanout', false, false, false);
 $name = $argv[1];
 $url = $argv[2];
 $owner = $argv[3];
+$language = isset($argv[4]) ? $argv[4] : 'PHP';
+$dependency_manager = ($language === 'PHP') ? 'composer' : 'npm';
+
 
 $full_name = trim(parse_url($url, PHP_URL_PATH), '/');
 
@@ -28,8 +31,8 @@ $event = [
         'url' => $url,
         'description' => 'A repository called ' . $full_name,
         'full_name' => $full_name,
-        'language' => 'PHP',
-        'dependency_manager' => 'composer',
+        'language' => $language,
+        'dependency_manager' => $dependency_manager,
         'frequency' => '1',
         'hour' => '1',
         'timezone' => 'Europe/London',
