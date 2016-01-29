@@ -11,9 +11,14 @@ mysql:
     - MYSQL_ROOT_PASSWORD
 
 repository:
-  build: repository/
+  build: nginx/repository/
   ports:
     - "49400:80"
+  links:
+    - repositoryservice
+
+repositoryservice:
+  build: repository/
   links:
     - rabbitmq
     - token
@@ -39,14 +44,14 @@ update:
     - GIT_API_HOST
     - UPDATE_COMMAND_CHANNEL
 
-nginxui:
-  build: nginx/
+ui:
+  build: nginx/ui/
   ports:
     - "49401:80"
   links:
-    - ui
+    - uiservice
 
-ui:
+uiservice:
   build: ui/
   links:
     - repository
@@ -60,9 +65,14 @@ ui:
     - PUB_SUB_CHANNEL
 
 scheduler:
-  build: scheduler/
+  build: nginx/scheduler/
   ports:
     - "49402:80"
+  links:
+    - schedulerservice
+
+schedulerservice:
+  build: scheduler/
   links:
     - rabbitmq
     - mysql
@@ -71,9 +81,14 @@ scheduler:
     - PUB_SUB_CHANNEL
 
 token:
-  build: tokens/
+  build: nginx/token/
   ports:
     - "49403:80"
+  links:
+    - tokenservice
+
+tokenservice:
+  build: tokens/
   links:
     - redis
     - rabbitmq
