@@ -1,17 +1,9 @@
-FROM ubuntu:latest
+FROM php:latest
 
 MAINTAINER Tim Rodger <tim.rodger@gmail.com>
 
-EXPOSE 80
-
 RUN apt-get update -qq && \
     apt-get install -y \
-    php5 \
-    php5-mysql \
-    php5-curl \
-    php5-cli \
-    php5-intl \
-    php5-fpm \
     curl \
     libicu-dev \
     zip \
