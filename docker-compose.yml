@@ -1,5 +1,6 @@
 rabbitmq:
-   image: rabbitmq 
+  image: rabbitmq
+  restart: always
 
 redis:
   image: redis
@@ -19,6 +20,7 @@ repository:
     - mysql
   environment:
     - MYSQL_ROOT_PASSWORD
+    - PUB_SUB_CHANNEL
 
 director:
   build: director/
@@ -26,16 +28,26 @@ director:
     - rabbitmq
     - token
     - repository
+  environment:
+    - PUB_SUB_CHANNEL
 
 update:
   build: update/
   links:
     - rabbitmq
+  environment:
+    - GIT_API_HOST
+    - UPDATE_COMMAND_CHANNEL
+
+nginxui:
+  build: nginx/
+  ports:
+    - "49401:80"
+  links:
+    - ui
 
 ui:
   build: ui/
-  ports:
-    - "49401:80"
   links:
     - repository
     - token
@@ -45,6 +57,7 @@ ui:
     - GH_BASIC_CLIENT_SECRET
     - GIT_HOST
     - GIT_API_HOST
+    - PUB_SUB_CHANNEL
 
 scheduler:
   build: scheduler/
@@ -55,6 +68,7 @@ scheduler:
     - mysql
   environment:
     - MYSQL_ROOT_PASSWORD
+    - PUB_SUB_CHANNEL
 
 token:
   build: tokens/
@@ -65,6 +79,7 @@ token:
     - rabbitmq
   environment:
     - TOKEN_ENCRYPTION_KEY
+    - PUB_SUB_CHANNEL
 
 documents:
   build: documents/
@@ -76,3 +91,4 @@ documents:
     - scheduler
   environment:
     - MYSQL_ROOT_PASSWORD
+    - PUB_SUB_CHANNEL
